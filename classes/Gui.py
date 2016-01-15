@@ -1,9 +1,9 @@
+import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from os.path import expanduser
 from classes.FormWidget import FormWidget
-import os
 from classes.LogParser import LogParser
 from classes.SqliteStorage import SqliteStorage
 
