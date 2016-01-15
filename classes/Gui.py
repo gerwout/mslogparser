@@ -42,6 +42,15 @@ class Gui(QMainWindow):
 
         return createDBAction
 
+    def _getOpenDBAction(self):
+        openDBAction = QAction('Open database', self)
+        openDBAction.setShortcut('Ctrl+O')
+        openDBAction.setStatusTip('Open database')
+        openDBAction.triggered.connect(self._openDBDialog);
+
+        return openDBAction
+
+
     def _createNewDBDialog(self):
         fileObj = QFileDialog.getSaveFileName(self, 'Create new database', expanduser("~"), filter='*.sqlite')
         if fileObj:
@@ -50,7 +59,17 @@ class Gui(QMainWindow):
             if file_name.endswith(".sqlite"):
                 file_name = file_name[:-7]
             self._storage = SqliteStorage(file_name, create=True)
-            self.statusBar().showMessage('Database '+file_name+" created.")
+            self.statusBar().showMessage('Database '+file_name+".sqlite created.")
+
+    def _openDBDialog(self):
+        fileObj = QFileDialog.getOpenFileName(parent=self, caption='Open file', directory=expanduser("~"),
+                                              filter='*.sqlite')
+        if fileObj:
+            file_name = str(fileObj[0])
+            self._storage = SqliteStorage(file_name)
+            self.logFileAction.setDisabled(False)
+            self.statusBar().showMessage('Database '+file_name+" opened.")
+        self._fillTable()
 
     def _openFileDialog(self):
         fileObj = QFileDialog.getOpenFileName(parent=self, caption='Open file', directory=expanduser("~"))
@@ -105,26 +124,27 @@ class Gui(QMainWindow):
     # @todo: detect existince of table and replace, otherwise it will be added multiple times
     # i.e. open new log file...
     def _fillTable(self):
-        self._table = QTableWidget()
-        self._table.cellClicked.connect(self.clickTableCell)
         rows = self._storage.get_log_data()
-        self._handleRows(rows)
-        min_date_time = QDateTime.fromString(self._storage.getMinDateTime(), "yyyy-MM-dd HH:mm:ss")
-        max_date_time = QDateTime.fromString(self._storage.getMaxDateTime(), "yyyy-MM-dd HH:mm:ss")
-        hostnames = self._storage.get_unique_hostnames()
-        users = self._storage.get_unique_users()
-        objects = self._storage.get_unique_objects()
-        types = self._storage.get_unique_types()
-        self.form_widget.first_date_picker.setMinimumDateTime(min_date_time)
-        self.form_widget.first_date_picker.setDateTime(min_date_time)
-        self.form_widget.second_date_picker.setMaximumDateTime(max_date_time)
-        self.form_widget.second_date_picker.setDateTime(max_date_time)
-        self.form_widget.host_names.addItems(hostnames)
-        self.form_widget.users.addItems(users)
-        self.form_widget.objects.addItems(objects)
-        self.form_widget.types.addItems(types)
-        self.form_widget.show()
-        self._layout.addWidget(self._table)
+        if rows:
+            self._table = QTableWidget()
+            self._table.cellClicked.connect(self.clickTableCell)
+            self._handleRows(rows)
+            min_date_time = QDateTime.fromString(self._storage.getMinDateTime(), "yyyy-MM-dd HH:mm:ss")
+            max_date_time = QDateTime.fromString(self._storage.getMaxDateTime(), "yyyy-MM-dd HH:mm:ss")
+            hostnames = self._storage.get_unique_hostnames()
+            users = self._storage.get_unique_users()
+            objects = self._storage.get_unique_objects()
+            types = self._storage.get_unique_types()
+            self.form_widget.first_date_picker.setMinimumDateTime(min_date_time)
+            self.form_widget.first_date_picker.setDateTime(min_date_time)
+            self.form_widget.second_date_picker.setMaximumDateTime(max_date_time)
+            self.form_widget.second_date_picker.setDateTime(max_date_time)
+            self.form_widget.host_names.addItems(hostnames)
+            self.form_widget.users.addItems(users)
+            self.form_widget.objects.addItems(objects)
+            self.form_widget.types.addItems(types)
+            self.form_widget.show()
+            self._layout.addWidget(self._table)
 
 
     # @todo: does not really belong in this class
@@ -144,9 +164,12 @@ class Gui(QMainWindow):
         self.exitAction = self._getExitAction()
         self.logFileAction = self._getOpenLogFileAction()
         self.createDBAction = self._getCreateDBAction()
+        self.openDBAction = self._getOpenDBAction()
+
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('&File')
         fileMenu.addAction(self.createDBAction)
+        fileMenu.addAction(self.openDBAction)
         fileMenu.addAction(self.logFileAction)
         fileMenu.addAction(self.exitAction)
         self._layout = QVBoxLayout()

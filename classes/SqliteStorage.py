@@ -5,7 +5,8 @@ from collections import OrderedDict
 class SqliteStorage:
 
     def __init__(self, filename, create=False):
-        filename = filename + ".sqlite"
+        if not filename.endswith(".sqlite"):
+            filename = filename + ".sqlite"
         self.__connect_db(filename)
         if create:
             self.__create_sqlite_db()

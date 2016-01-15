@@ -1,6 +1,5 @@
 import re
 
-#@todo: create db menu option, grey out open file at that point in time, enable after creation
 #@todo: open existing db option
 #@todo: ability to parse multiple log files at the same point in time
 #@todo: full text search should not be fuzzy
