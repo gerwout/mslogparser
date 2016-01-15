@@ -7,7 +7,6 @@ from classes.FormWidget import FormWidget
 from classes.LogParser import LogParser
 from classes.SqliteStorage import SqliteStorage
 
-
 class Gui(QMainWindow):
     def __init__(self):
         super(Gui, self).__init__()
@@ -17,32 +16,49 @@ class Gui(QMainWindow):
         exitAction = QAction('&Exit', self)
         exitAction.setShortcut('Ctrl+Q')
         exitAction.setStatusTip('Exit application')
-        exitAction.triggered.connect(qApp.quit)
+        exitAction.triggered.connect(self._quitApplication)
 
         return exitAction
 
+    def _quitApplication(self):
+        if self.logFileAction.isEnabled():
+            self._storage.close_db()
+        qApp.quit()
+
     def _getOpenLogFileAction(self):
-        logFileAction = QAction('Open log file', self)
-        logFileAction.setShortcut('Ctrl+O')
-        logFileAction.setStatusTip('Open eVision log file')
+        logFileAction = QAction('Add log file(s)', self)
+        logFileAction.setShortcut('Ctrl+A')
+        logFileAction.setStatusTip('Add eVision log file(s)')
+        logFileAction.setDisabled(True)
         logFileAction.triggered.connect(self._openFileDialog);
 
         return logFileAction
+
+    def _getCreateDBAction(self):
+        createDBAction = QAction('Create new database', self)
+        createDBAction.setShortcut('Ctrl+N')
+        createDBAction.setStatusTip('Create new database')
+        createDBAction.triggered.connect(self._createNewDBDialog);
+
+        return createDBAction
+
+    def _createNewDBDialog(self):
+        fileObj = QFileDialog.getSaveFileName(self, 'Create new database', expanduser("~"), filter='*.sqlite')
+        if fileObj:
+            self.logFileAction.setDisabled(False)
+            file_name = str(fileObj[0])
+            if file_name.endswith(".sqlite"):
+                file_name = file_name[:-7]
+            self._storage = SqliteStorage(file_name, create=True)
+            self.statusBar().showMessage('Database '+file_name+" created.")
 
     def _openFileDialog(self):
         fileObj = QFileDialog.getOpenFileName(parent=self, caption='Open file', directory=expanduser("~"))
         if fileObj:
             file_name = str(fileObj[0])
-            sql_file_name = fileObj[0] + ".sqlite"
-            if os.path.isfile(sql_file_name):
-                msg = "An existing database for this logfile has been found, do you want to use this one?"
-                reply = QMessageBox.question(self, 'Message', msg, QMessageBox.Yes, QMessageBox.No)
-                if reply == QMessageBox.No:
-                    os.remove(sql_file_name)
-                    self.import_log_file(file_name)
-            else:
-                self.import_log_file(file_name)
-        self._fillTable(file_name)
+            self.import_log_file(file_name)
+
+        self._fillTable()
 
     def updateTable(self, **kwargs):
         self._table.setRowCount(0)
@@ -88,10 +104,9 @@ class Gui(QMainWindow):
 
     # @todo: detect existince of table and replace, otherwise it will be added multiple times
     # i.e. open new log file...
-    def _fillTable(self, log_file_name):
+    def _fillTable(self):
         self._table = QTableWidget()
         self._table.cellClicked.connect(self.clickTableCell)
-        self._storage = SqliteStorage(log_file_name)
         rows = self._storage.get_log_data()
         self._handleRows(rows)
         min_date_time = QDateTime.fromString(self._storage.getMinDateTime(), "yyyy-MM-dd HH:mm:ss")
@@ -114,21 +129,26 @@ class Gui(QMainWindow):
 
     # @todo: does not really belong in this class
     def import_log_file(self, file_name):
-         parser = LogParser()
+         parser = LogParser(storage=self._storage)
          self.statusBar().showMessage('Importing log file...')
          parser.parse_log_file(file_name)
+         self._storage.update_fulltext_index()
+         self._storage.create_indexes()
+         # self._storage.close_db()
          self.statusBar().showMessage('Log file imported')
 
     def initUI(self):
-        self.setWindowTitle('eVision Logparser')
+        self.setWindowTitle('Microsoft Logparser')
         self.statusBar()
         # init menu
-        exitAction = self._getExitAction()
-        logFileAction = self._getOpenLogFileAction()
+        self.exitAction = self._getExitAction()
+        self.logFileAction = self._getOpenLogFileAction()
+        self.createDBAction = self._getCreateDBAction()
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('&File')
-        fileMenu.addAction(logFileAction);
-        fileMenu.addAction(exitAction)
+        fileMenu.addAction(self.createDBAction)
+        fileMenu.addAction(self.logFileAction)
+        fileMenu.addAction(self.exitAction)
         self._layout = QVBoxLayout()
         self.form_widget = FormWidget(self)
         self._layout.addWidget(self.form_widget)

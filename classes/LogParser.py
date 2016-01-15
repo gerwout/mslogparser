@@ -1,16 +1,19 @@
 import re
-from classes.SqliteStorage import SqliteStorage
 
+#@todo: create db menu option, grey out open file at that point in time, enable after creation
+#@todo: open existing db option
 #@todo: ability to parse multiple log files at the same point in time
 #@todo: full text search should not be fuzzy
-#@todo: add ability to export 1 or more messages
 #@todo: show message dialog after clicking
 #@todo: add trans and process id
+#@todo: add ability to export 1 or more messages
+#@todo: cancel button on create db crashes app
+#@todo: investigate why there is a .sqlite file created in the project folder
 
 class LogParser:
 
-    # no other storage yet, just a placeholder in case we meed another one
-    __storage = "sqlite"
+    def __init__(self, **kwargs):
+        self._storage = kwargs['storage']
 
     # @todo: should not exit, put throw something in and log to some debug log
     def __parse_line(self, line):
@@ -23,9 +26,6 @@ class LogParser:
             exit()
 
     def parse_log_file(self, file_name):
-        if self.__storage == "sqlite":
-            storage = SqliteStorage(file_name, create=True)
-
         total = ""
         old_date_time = False
         with open(file_name) as file:
@@ -42,15 +42,13 @@ class LogParser:
                 # new message detected
                 if date_time != old_date_time and old_date_time != False:
                     # write the log
-                    storage.write_log_line(date_time=date_time, host_name=host_name, process_id=process_id,
+                    self._storage.write_log_line(date_time=date_time, host_name=host_name, process_id=process_id,
                                                trans_id=trans_id, user=user, object=object, type=type, msg=total)
                     total = msg
                 # continuation of existing message or first message
                 else:
-                    total = total + "\n" + msg
+                    if total == "":
+                        total = msg
+                    else:
+                        total = total + "\n" + msg
                 old_date_time = date_time
-
-        if self.__storage == "sqlite":
-            storage.update_fulltext_index()
-            storage.create_indexes()
-            storage.close_db()
