@@ -1,6 +1,5 @@
 import re
 
-#@todo: open existing db option
 #@todo: ability to parse multiple log files at the same point in time
 #@todo: full text search should not be fuzzy
 #@todo: show message dialog after clicking
@@ -8,20 +7,21 @@ import re
 #@todo: add ability to export 1 or more messages
 #@todo: cancel button on create db crashes app
 #@todo: investigate why there is a .sqlite file created in the project folder
-
+#@todo: introduce debug log (i.e. parse_line)
 class LogParser:
 
     def __init__(self, **kwargs):
         self._storage = kwargs['storage']
 
-    # @todo: should not exit, put throw something in and log to some debug log
     def __parse_line(self, line):
         m =  re.match("^\[([0-9-]+\s+[0-9:\.]+)\s+([a-zA-Z0-9-_]+)\s+([a-zA-Z0-9]+)\s+([a-zA-Z0-9]+)\s+"
-                      "([a-zA-Z0-9\\\]+)\s+([a-zA-Z0-9_-]+)\s+([a-zA-Z]+)\s+\]\s+(.*)$", line)
+                      "([a-zA-Z0-9\\\]+)\s+([a-zA-Z0-9_-]+)\s+([a-zA-Z]+)\s{0,}\]\s+(.*)$", line)
+
         try:
             return m.groups()
-        except:
-            print (line)
+        except AttributeError:
+            print("Line does not match defined logging pattern!")
+            print(line)
             exit()
 
     def parse_log_file(self, file_name):

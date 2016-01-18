@@ -120,6 +120,20 @@ class SqliteStorage:
         return rows
 
 
+    def drop_indexes(self):
+        drop_indexes = []
+        drop_indexes.append('DROP INDEX IF EXISTS idx_date_time;')
+        drop_indexes.append('DROP INDEX IF EXISTS idx_host_name;')
+        drop_indexes.append('DROP INDEX IF EXISTS idx_pid;')
+        drop_indexes.append('DROP INDEX IF EXISTS idx_transid;')
+        drop_indexes.append('DROP INDEX IF EXISTS idx_user;')
+        drop_indexes.append('DROP INDEX IF EXISTS idx_object;')
+        drop_indexes.append('DROP INDEX IF EXISTS idx_type;')
+        for drop_index in drop_indexes:
+            self.__cursor.execute(drop_index)
+            self.__conn.commit()
+
+
     def create_indexes(self):
         indexes = []
         indexes.append("CREATE INDEX idx_date_time on logs (date_time);")
@@ -137,6 +151,11 @@ class SqliteStorage:
     def update_fulltext_index(self):
         query = "INSERT INTO messages(docid, message) SELECT id, message FROM logs;"
         self.__cursor.execute(query)
+
+    def drop_fulltext_index(self):
+        query = "DELETE FROM messages;"
+        self.__cursor.execute(query)
+
 
     def write_log_line(self, **kwargs):
         date_time = kwargs.get('date_time')

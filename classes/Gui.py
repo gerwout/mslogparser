@@ -1,4 +1,3 @@
-import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -58,6 +57,11 @@ class Gui(QMainWindow):
             file_name = str(fileObj[0])
             if file_name.endswith(".sqlite"):
                 file_name = file_name[:-7]
+            try:
+                if self._storage:
+                    self._storage.close_db()
+            except AttributeError:
+                pass
             self._storage = SqliteStorage(file_name, create=True)
             self.statusBar().showMessage('Database '+file_name+".sqlite created.")
 
@@ -66,6 +70,11 @@ class Gui(QMainWindow):
                                               filter='*.sqlite')
         if fileObj:
             file_name = str(fileObj[0])
+            try:
+                if self._storage:
+                    self._storage.close_db()
+            except AttributeError:
+                pass
             self._storage = SqliteStorage(file_name)
             self.logFileAction.setDisabled(False)
             self.statusBar().showMessage('Database '+file_name+" opened.")
@@ -73,12 +82,20 @@ class Gui(QMainWindow):
 
     def _openFileDialog(self):
         fileObj = QFileDialog.getOpenFileName(parent=self, caption='Open file', directory=expanduser("~"))
+
         if fileObj:
+            self._storage.drop_fulltext_index()
+            self._storage.drop_indexes()
             file_name = str(fileObj[0])
             self.import_log_file(file_name)
+            self.statusBar().showMessage('Log file ' + file_name + 'imported')
 
+        self.statusBar().showMessage('Busy creating indexes...')
+        self._storage.update_fulltext_index()
+        self._storage.create_indexes()
         self._fillTable()
 
+    #@todo: rowcount sufficient? i.e. memory cleaned?
     def updateTable(self, **kwargs):
         self._table.setRowCount(0)
         first_time_stamp = kwargs.get('first_time_stamp')
@@ -121,11 +138,16 @@ class Gui(QMainWindow):
         data = self._table.model().index(row, 7).data()
         print(data)
 
-    # @todo: detect existince of table and replace, otherwise it will be added multiple times
-    # i.e. open new log file...
     def _fillTable(self):
         rows = self._storage.get_log_data()
         if rows:
+            try:
+                if self._table:
+                    self._layout.removeWidget(self._table)
+                    self._table = None
+            except AttributeError:
+                pass
+
             self._table = QTableWidget()
             self._table.cellClicked.connect(self.clickTableCell)
             self._handleRows(rows)
@@ -150,12 +172,8 @@ class Gui(QMainWindow):
     # @todo: does not really belong in this class
     def import_log_file(self, file_name):
          parser = LogParser(storage=self._storage)
-         self.statusBar().showMessage('Importing log file...')
+         self.statusBar().showMessage('Importing log file ' + file_name + '...')
          parser.parse_log_file(file_name)
-         self._storage.update_fulltext_index()
-         self._storage.create_indexes()
-         # self._storage.close_db()
-         self.statusBar().showMessage('Log file imported')
 
     def initUI(self):
         self.setWindowTitle('Microsoft Logparser')
