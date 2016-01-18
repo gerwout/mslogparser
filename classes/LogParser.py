@@ -1,6 +1,4 @@
 import re
-
-#@todo: ability to parse multiple log files at the same point in time
 #@todo: full text search should not be fuzzy
 #@todo: show message dialog after clicking
 #@todo: add trans and process id
@@ -11,12 +9,11 @@ import re
 class LogParser:
 
     def __init__(self, **kwargs):
-        self._storage = kwargs['storage']
+        self._storage = kwargs.get('storage')
 
     def __parse_line(self, line):
         m =  re.match("^\[([0-9-]+\s+[0-9:\.]+)\s+([a-zA-Z0-9-_]+)\s+([a-zA-Z0-9]+)\s+([a-zA-Z0-9]+)\s+"
-                      "([a-zA-Z0-9\\\]+)\s+([a-zA-Z0-9_-]+)\s+([a-zA-Z]+)\s{0,}\]\s+(.*)$", line)
-
+                      "([a-zA-Z0-9\\\]+)?\s+([.a-zA-Z0-9_-]+)\s+([a-zA-Z]+)\s{0,}\]\s+(.*)$", line)
         try:
             return m.groups()
         except AttributeError:

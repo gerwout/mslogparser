@@ -42,7 +42,7 @@ class SqliteStorage:
 
 
         self.__cursor.execute("CREATE VIRTUAL TABLE messages USING FTS4 (content='logs', message TEXT);")
-        self.__conn.commit()
+        self.commit_changes()
 
     def get_unique_users(self):
         query = "SELECT DISTINCT user FROM logs ORDER BY user"
@@ -131,7 +131,8 @@ class SqliteStorage:
         drop_indexes.append('DROP INDEX IF EXISTS idx_type;')
         for drop_index in drop_indexes:
             self.__cursor.execute(drop_index)
-            self.__conn.commit()
+
+        self.commit_changes()
 
 
     def create_indexes(self):
@@ -146,16 +147,22 @@ class SqliteStorage:
 
         for index in indexes:
             self.__cursor.execute(index)
-            self.__conn.commit()
+
+        self.commit_changes()
 
     def update_fulltext_index(self):
         query = "INSERT INTO messages(docid, message) SELECT id, message FROM logs;"
         self.__cursor.execute(query)
+        self.commit_changes()
 
     def drop_fulltext_index(self):
         query = "DELETE FROM messages;"
         self.__cursor.execute(query)
+        self.commit_changes()
 
+
+    def commit_changes(self):
+        self.__conn.commit()
 
     def write_log_line(self, **kwargs):
         date_time = kwargs.get('date_time')
@@ -169,7 +176,6 @@ class SqliteStorage:
         query = "INSERT INTO logs (date_time, host_name, pid, transid, user, object, type, message) " \
                 "VALUES(?, ?, ?, ?, ?, ?, ?, ?);"
         self.__cursor.execute(query, (date_time, host_name, process_id, trans_id, user, object, type, msg))
-        self.__conn.commit()
 
     def getMinDateTime(self):
         query = "SELECT MIN(date_time) AS min FROM logs"

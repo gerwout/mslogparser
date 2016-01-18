@@ -81,19 +81,22 @@ class Gui(QMainWindow):
         self._fillTable()
 
     def _openFileDialog(self):
-        fileObj = QFileDialog.getOpenFileName(parent=self, caption='Open file', directory=expanduser("~"))
+        fileObj = QFileDialog.getOpenFileNames(parent=self, caption='Open file', directory=expanduser("~"))
 
         if fileObj:
             self._storage.drop_fulltext_index()
             self._storage.drop_indexes()
-            file_name = str(fileObj[0])
-            self.import_log_file(file_name)
-            self.statusBar().showMessage('Log file ' + file_name + 'imported')
+            parser = LogParser(storage=self._storage)
+            for file_name in fileObj[0]:
+                self.statusBar().showMessage('Importing log file ' + file_name + '...')
+                QApplication.processEvents()
+                parser.parse_log_file(str(file_name))
 
-        self.statusBar().showMessage('Busy creating indexes...')
-        self._storage.update_fulltext_index()
-        self._storage.create_indexes()
-        self._fillTable()
+            self._storage.commit_changes()
+            self.statusBar().showMessage('Busy creating indexes...')
+            self._storage.update_fulltext_index()
+            self._storage.create_indexes()
+            self._fillTable()
 
     #@todo: rowcount sufficient? i.e. memory cleaned?
     def updateTable(self, **kwargs):
@@ -167,13 +170,6 @@ class Gui(QMainWindow):
             self.form_widget.types.addItems(types)
             self.form_widget.show()
             self._layout.addWidget(self._table)
-
-
-    # @todo: does not really belong in this class
-    def import_log_file(self, file_name):
-         parser = LogParser(storage=self._storage)
-         self.statusBar().showMessage('Importing log file ' + file_name + '...')
-         parser.parse_log_file(file_name)
 
     def initUI(self):
         self.setWindowTitle('Microsoft Logparser')
