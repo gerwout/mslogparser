@@ -139,7 +139,7 @@ class Gui(QMainWindow):
     def clickTableCell(self, row, cell):
         self._table.selectRow(row)
         data = self._table.model().index(row, 7).data()
-        print(data)
+        self._message_window.setText(data)
 
     def _fillTable(self):
         rows = self._storage.get_log_data()
@@ -147,12 +147,14 @@ class Gui(QMainWindow):
             try:
                 if self._table:
                     self._layout.removeWidget(self._table)
+                    self._layout.removeWidget(self._message_window)
                     self._table = None
             except AttributeError:
                 pass
 
             self._table = QTableWidget()
             self._table.cellClicked.connect(self.clickTableCell)
+            self._message_window = QTextEdit()
             self._handleRows(rows)
             min_date_time = QDateTime.fromString(self._storage.getMinDateTime(), "yyyy-MM-dd HH:mm:ss")
             max_date_time = QDateTime.fromString(self._storage.getMaxDateTime(), "yyyy-MM-dd HH:mm:ss")
@@ -170,6 +172,7 @@ class Gui(QMainWindow):
             self.form_widget.types.addItems(types)
             self.form_widget.show()
             self._layout.addWidget(self._table)
+            self._layout.addWidget(self._message_window)
 
     def initUI(self):
         self.setWindowTitle('Microsoft Logparser')
