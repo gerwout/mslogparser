@@ -1,11 +1,11 @@
 import re
-#@todo: full text search should not be fuzzy
 #@todo: show message dialog after clicking
 #@todo: add trans and process id
 #@todo: add ability to export 1 or more messages
 #@todo: cancel button on create db crashes app
 #@todo: investigate why there is a .sqlite file created in the project folder
 #@todo: introduce debug log (i.e. parse_line)
+#@todo: pressing enter in search form should search
 class LogParser:
 
     def __init__(self, **kwargs):

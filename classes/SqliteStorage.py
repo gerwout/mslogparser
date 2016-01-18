@@ -13,8 +13,6 @@ class SqliteStorage:
 
 
     def __connect_db(self, file_name):
-        # @todo change in some debug logging
-        # print os.getcwd()
         self.__conn = sqlite3.connect(file_name)
         self.__conn.row_factory = self.__dict_factory
         self.__cursor = self.__conn.cursor()
@@ -110,7 +108,7 @@ class SqliteStorage:
                 params += [kwargs['type']]
                 query += "AND type = ? "
             if 'full_text' in kwargs and kwargs['full_text'] != "":
-                params += [kwargs['full_text']]
+                params += ["*" + kwargs['full_text'] + "*"]
                 query += "AND id IN (SELECT docid FROM messages WHERE message MATCH ?) "
         query += " order by date_time"
         self.__cursor.execute(query, params)
