@@ -127,7 +127,10 @@ class SqliteStorage:
                 query += "AND transid = ? "
             if 'user' in kwargs and kwargs['user'] != "-":
                 params += [kwargs['user']]
-                query += "AND user = ? "
+                if kwargs['user'] != "":
+                    query += "AND user = ? "
+                else:
+                    query += "AND (user IS NULL OR user = ?)"
             if 'object' in kwargs and kwargs['object'] != "-":
                 params += [kwargs['object']]
                 query += "AND object = ? "

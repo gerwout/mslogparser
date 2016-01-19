@@ -1,5 +1,4 @@
 import re
-#@todo: search when user is empty
 #@todo: pressing enter in search form should search
 #@todo: cancel button on create db crashes app
 #@todo: add ability to export 1 or more messages
