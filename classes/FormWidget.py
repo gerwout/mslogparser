@@ -30,8 +30,10 @@ class FormWidget(QWidget):
         self.types = QComboBox()
         self.types.addItem("-")
         self.full_text_search = QLineEdit()
+        self.full_text_search.returnPressed.connect(self.handleSearch)
         self.search_button = QPushButton("&Search")
         self.search_button.clicked.connect(self.handleSearch)
+
 
     def __layout(self):
         self._grid = QHBoxLayout()
@@ -49,6 +51,7 @@ class FormWidget(QWidget):
         self.setLayout(self._grid)
 
     def handleSearch(self):
+        self.search_button.setDisabled(True)
         first_time_stamp = int(self.first_date_picker.dateTime().toPyDateTime().replace(tzinfo=timezone.utc).timestamp())
         second_time_stamp = int(self.second_date_picker.dateTime().toPyDateTime().replace(tzinfo=timezone.utc).timestamp())
         host_name = str(self.host_names.currentText())
@@ -61,3 +64,4 @@ class FormWidget(QWidget):
         self.nativeParentWidget().updateTable(first_time_stamp=first_time_stamp, second_time_stamp=second_time_stamp,
                                               host_name=host_name, pid=pid, trans_id=trans_id,user=user, object=object,
                                               type=type, full_text=full_text)
+        self.search_button.setDisabled(False)
