@@ -64,6 +64,12 @@ class Gui(QMainWindow):
                 pass
             self._storage = SqliteStorage(file_name, create=True)
             self.statusBar().showMessage('Database '+file_name+".sqlite created.")
+            if self._table:
+                self._table.clear()
+                self._table.setRowCount(0)
+                self._table.hide()
+                self._message_window.hide()
+
 
     def _openDBDialog(self):
         fileObj = QFileDialog.getOpenFileName(parent=self, caption='Open file', directory=expanduser("~"),
@@ -198,6 +204,7 @@ class Gui(QMainWindow):
         fileMenu.addAction(self.logFileAction)
         fileMenu.addAction(self.exitAction)
         self._layout = QVBoxLayout()
+        self._layout.setAlignment(Qt.AlignTop)
         self.form_widget = FormWidget(self)
         self._layout.addWidget(self.form_widget)
         panel = QWidget()

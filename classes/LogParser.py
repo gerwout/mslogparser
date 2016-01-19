@@ -1,5 +1,4 @@
 import re
-#@todo: when having an existing search, create new db, should empty existing table
 #@todo: add ability to export 1 or more messages
 #@todo: introduce debug log (i.e. parse_line)
 class LogParser:
