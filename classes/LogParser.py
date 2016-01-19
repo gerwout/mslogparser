@@ -1,8 +1,6 @@
 import re
-#@todo: cancel button on create db crashes app
 #@todo: when having an existing search, create new db, should empty existing table
 #@todo: add ability to export 1 or more messages
-#@todo: investigate why there is a .sqlite file created in the project folder
 #@todo: introduce debug log (i.e. parse_line)
 class LogParser:
 

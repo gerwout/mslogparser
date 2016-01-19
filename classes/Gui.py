@@ -52,7 +52,7 @@ class Gui(QMainWindow):
 
     def _createNewDBDialog(self):
         fileObj = QFileDialog.getSaveFileName(self, 'Create new database', expanduser("~"), filter='*.sqlite')
-        if fileObj:
+        if fileObj and fileObj[0] != "":
             self.logFileAction.setDisabled(False)
             file_name = str(fileObj[0])
             if file_name.endswith(".sqlite"):
@@ -68,7 +68,7 @@ class Gui(QMainWindow):
     def _openDBDialog(self):
         fileObj = QFileDialog.getOpenFileName(parent=self, caption='Open file', directory=expanduser("~"),
                                               filter='*.sqlite')
-        if fileObj:
+        if fileObj and fileObj[0] != "":
             file_name = str(fileObj[0])
             try:
                 if self._storage:
@@ -78,12 +78,12 @@ class Gui(QMainWindow):
             self._storage = SqliteStorage(file_name)
             self.logFileAction.setDisabled(False)
             self.statusBar().showMessage('Database '+file_name+" opened.")
-        self._fillTable()
+            self._fillTable()
 
     def _openFileDialog(self):
         fileObj = QFileDialog.getOpenFileNames(parent=self, caption='Open file', directory=expanduser("~"))
 
-        if fileObj:
+        if fileObj and fileObj[0] != "":
             self._storage.drop_fulltext_index()
             self._storage.drop_indexes()
             parser = LogParser(storage=self._storage)
