@@ -5,6 +5,8 @@ from os.path import expanduser
 from classes.FormWidget import FormWidget
 from classes.LogParser import LogParser
 from classes.SqliteStorage import SqliteStorage
+import csv
+import io
 
 class Gui(QMainWindow):
     def __init__(self):
@@ -150,6 +152,46 @@ class Gui(QMainWindow):
             data = self._table.model().index(row, 7).data()
             self._message_window.setText(data)
 
+    def _handleExport(self):
+        items = self._table.selectedItems()
+        output = io.StringIO()
+        header = ["date_time", "host_name", "pid", "transaction_id", "user", "object", "type", "message"]
+        writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
+        writer.writerow(header)
+        for item in items:
+            row = item.row()
+            date_time = self._table.model().index(row, 0).data()
+            host_name = self._table.model().index(row, 1).data()
+            pid = self._table.model().index(row, 2).data()
+            trans_id = self._table.model().index(row, 3).data()
+            user = self._table.model().index(row, 4).data()
+            object = self._table.model().index(row, 5).data()
+            type = self._table.model().index(row, 6).data()
+            message = self._table.model().index(row, 7).data()
+            csv_data = [date_time, host_name, pid, trans_id, user, object, type, message]
+            writer.writerow(csv_data)
+        csv_content = output.getvalue()
+        fileObj = QFileDialog.getSaveFileName(self, "Save csv file", "", ".csv")
+        if fileObj and fileObj[0] != "":
+            file_name = fileObj[0] + fileObj[1]
+            csv_file = open(file_name, "w")
+            csv_file.write(csv_content)
+            csv_file.close()
+            self.statusBar().showMessage(file_name + ' saved.')
+
+
+
+
+    def _createRightClickMenu(self, pos):
+        #row = self._table.rowAt(pos.y())
+        #column = self._table.columnAt(pos.x())
+        menu = QMenu(self._table)
+        exportAction = QAction("&Export as csv", None)
+        exportAction.triggered.connect(self._handleExport)
+        menu.addAction(exportAction)
+        menu.exec_(self._table.viewport().mapToGlobal(pos))
+
+
     def _fillTable(self):
         rows = self._storage.get_log_data()
         if rows:
@@ -162,6 +204,8 @@ class Gui(QMainWindow):
                 pass
 
             self._table = QTableWidget()
+            self._table.setContextMenuPolicy(Qt.CustomContextMenu)
+            self._table.customContextMenuRequested.connect(self._createRightClickMenu)
             self._table.itemSelectionChanged.connect(self.showLogMessage)
             self._message_window = QTextEdit()
             self._message_window.setReadOnly(True)

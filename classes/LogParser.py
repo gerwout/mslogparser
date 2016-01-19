@@ -1,5 +1,4 @@
 import re
-#@todo: add ability to export 1 or more messages
 #@todo: introduce debug log (i.e. parse_line)
 class LogParser:
 
