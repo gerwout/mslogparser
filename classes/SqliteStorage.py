@@ -42,6 +42,27 @@ class SqliteStorage:
         self.__cursor.execute("CREATE VIRTUAL TABLE messages USING FTS4 (content='logs', message TEXT);")
         self.commit_changes()
 
+    def get_unique_process_ids(self):
+        query = "SELECT DISTINCT pid FROM logs ORDER BY pid"
+        self.__cursor.execute(query)
+        rows = self.__cursor.fetchall()
+        pids = []
+        for row in rows:
+            pids.append(str(row['pid']))
+
+        return pids
+
+    def get_unique_transaction_ids(self):
+        query = "SELECT DISTINCT transid FROM logs ORDER BY transid"
+        self.__cursor.execute(query)
+        rows = self.__cursor.fetchall()
+        transids = []
+        for row in rows:
+            transids.append(str(row['transid']))
+
+        return transids
+
+
     def get_unique_users(self):
         query = "SELECT DISTINCT user FROM logs ORDER BY user"
         self.__cursor.execute(query)
@@ -98,6 +119,12 @@ class SqliteStorage:
             if 'host_name' in kwargs and kwargs['host_name'] != "-":
                 params += [kwargs['host_name']]
                 query += "AND host_name = ? "
+            if 'pid' in kwargs and kwargs['pid'] != "-":
+                params += [kwargs['pid']]
+                query += "AND pid = ? "
+            if 'trans_id' in kwargs and kwargs['trans_id'] != "-":
+                params += [kwargs['trans_id']]
+                query += "AND transid = ? "
             if 'user' in kwargs and kwargs['user'] != "-":
                 params += [kwargs['user']]
                 query += "AND user = ? "

@@ -1,11 +1,10 @@
 import re
-#@todo: add trans and process id
 #@todo: search when user is empty
-#@todo: add ability to export 1 or more messages
+#@todo: pressing enter in search form should search
 #@todo: cancel button on create db crashes app
+#@todo: add ability to export 1 or more messages
 #@todo: investigate why there is a .sqlite file created in the project folder
 #@todo: introduce debug log (i.e. parse_line)
-#@todo: pressing enter in search form should search
 class LogParser:
 
     def __init__(self, **kwargs):

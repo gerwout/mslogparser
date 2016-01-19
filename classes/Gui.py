@@ -104,12 +104,15 @@ class Gui(QMainWindow):
         first_time_stamp = kwargs.get('first_time_stamp')
         second_time_stamp = kwargs.get('second_time_stamp')
         host_name = kwargs.get('host_name')
+        pid = kwargs.get('pid')
+        trans_id = kwargs.get('trans_id')
         user = kwargs.get('user')
         object = kwargs.get('object')
         type = kwargs.get('type')
         full_text = kwargs.get('full_text')
         rows = self._storage.get_log_data(first_time_stamp=first_time_stamp, second_time_stamp=second_time_stamp,
-                                          host_name=host_name, user=user, object=object, type=type, full_text=full_text)
+                                          host_name=host_name, pid=pid, trans_id=trans_id, user=user, object=object,
+                                          type=type, full_text=full_text)
         self._handleRows(rows)
 
     def _handleRows(self, rows):
@@ -160,6 +163,8 @@ class Gui(QMainWindow):
             min_date_time = QDateTime.fromString(self._storage.getMinDateTime(), "yyyy-MM-dd HH:mm:ss")
             max_date_time = QDateTime.fromString(self._storage.getMaxDateTime(), "yyyy-MM-dd HH:mm:ss")
             hostnames = self._storage.get_unique_hostnames()
+            pids = self._storage.get_unique_process_ids()
+            trans_ids = self._storage.get_unique_transaction_ids()
             users = self._storage.get_unique_users()
             objects = self._storage.get_unique_objects()
             types = self._storage.get_unique_types()
@@ -168,6 +173,8 @@ class Gui(QMainWindow):
             self.form_widget.second_date_picker.setMaximumDateTime(max_date_time)
             self.form_widget.second_date_picker.setDateTime(max_date_time)
             self.form_widget.host_names.addItems(hostnames)
+            self.form_widget.pids.addItems(pids)
+            self.form_widget.trans_ids.addItems(trans_ids)
             self.form_widget.users.addItems(users)
             self.form_widget.objects.addItems(objects)
             self.form_widget.types.addItems(types)
