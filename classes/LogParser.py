@@ -1,6 +1,6 @@
 import re
-#@todo: show message dialog after clicking
 #@todo: add trans and process id
+#@todo: search when user is empty
 #@todo: add ability to export 1 or more messages
 #@todo: cancel button on create db crashes app
 #@todo: investigate why there is a .sqlite file created in the project folder

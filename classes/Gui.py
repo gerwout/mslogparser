@@ -98,8 +98,8 @@ class Gui(QMainWindow):
             self._storage.create_indexes()
             self._fillTable()
 
-    #@todo: rowcount sufficient? i.e. memory cleaned?
     def updateTable(self, **kwargs):
+        self._table.clear()
         self._table.setRowCount(0)
         first_time_stamp = kwargs.get('first_time_stamp')
         second_time_stamp = kwargs.get('second_time_stamp')
@@ -115,9 +115,6 @@ class Gui(QMainWindow):
     def _handleRows(self, rows):
         count = len(rows)
         self._table.setRowCount(count)
-        flags = Qt.ItemFlags()
-        flags != Qt.ItemIsEditable
-        flags ^= Qt.ItemIsSelectable
         for row_index, row in enumerate(rows):
             if row_index == 0:
                 keys = row.keys()
@@ -129,17 +126,20 @@ class Gui(QMainWindow):
                 if isinstance(value, (int, float, complex)):
                     value = str(value)
                 item = QTableWidgetItem(value)
-                item.setFlags(flags)
                 item.setForeground(QColor.fromRgb(0, 0, 0))
                 self._table.setItem(row_index, col_index, item)
 
         self._table.resizeColumnsToContents()
         self.statusBar().showMessage(str(count) + ' results.')
 
-    def clickTableCell(self, row, cell):
-        self._table.selectRow(row)
-        data = self._table.model().index(row, 7).data()
-        self._message_window.setText(data)
+    def showLogMessage(self):
+        items = self._table.selectedItems()
+        count = len(items)
+        if count != 0:
+            row = items[count - 1].row()
+            self._table.selectRow(row)
+            data = self._table.model().index(row, 7).data()
+            self._message_window.setText(data)
 
     def _fillTable(self):
         rows = self._storage.get_log_data()
@@ -153,8 +153,9 @@ class Gui(QMainWindow):
                 pass
 
             self._table = QTableWidget()
-            self._table.cellClicked.connect(self.clickTableCell)
+            self._table.itemSelectionChanged.connect(self.showLogMessage)
             self._message_window = QTextEdit()
+            self._message_window.setReadOnly(True)
             self._handleRows(rows)
             min_date_time = QDateTime.fromString(self._storage.getMinDateTime(), "yyyy-MM-dd HH:mm:ss")
             max_date_time = QDateTime.fromString(self._storage.getMaxDateTime(), "yyyy-MM-dd HH:mm:ss")
