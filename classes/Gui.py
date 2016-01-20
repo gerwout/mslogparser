@@ -7,6 +7,7 @@ from classes.LogParser import LogParser
 from classes.SqliteStorage import SqliteStorage
 import csv
 import io
+import os
 
 class Gui(QMainWindow):
     def __init__(self):
@@ -59,21 +60,30 @@ class Gui(QMainWindow):
             file_name = str(fileObj[0])
             if file_name.endswith(".sqlite"):
                 file_name = file_name[:-7]
-            try:
-                if self._storage:
-                    self._storage.close_db()
-            except AttributeError:
-                pass
-            self._storage = SqliteStorage(file_name, create=True)
-            self.statusBar().showMessage('Database '+file_name+".sqlite created.")
-            try:
-                if self._table:
-                    self._table.clear()
-                    self._table.setRowCount(0)
-                    self._table.hide()
-                    self._message_window.hide()
-            except AttributeError:
-                pass
+
+            if os.path.isfile(file_name + ".sqlite"):
+                msg_box = QMessageBox()
+                msg_box.setText("The database "+ file_name + ".sqlite already exists!")
+                res = msg_box.exec_()
+                if res == QMessageBox.Ok:
+                    self._createNewDBDialog()
+            else:
+                try:
+                    if self._storage:
+                        self._storage.close_db()
+                except AttributeError:
+                    pass
+
+                self._storage = SqliteStorage(file_name, create=True)
+                self.statusBar().showMessage('Database '+file_name+".sqlite created.")
+                try:
+                    if self._table:
+                        self._table.clear()
+                        self._table.setRowCount(0)
+                        self._table.hide()
+                        self._message_window.hide()
+                except AttributeError:
+                    pass
 
 
     def _openDBDialog(self):
