@@ -66,11 +66,14 @@ class Gui(QMainWindow):
                 pass
             self._storage = SqliteStorage(file_name, create=True)
             self.statusBar().showMessage('Database '+file_name+".sqlite created.")
-            if self._table:
-                self._table.clear()
-                self._table.setRowCount(0)
-                self._table.hide()
-                self._message_window.hide()
+            try:
+                if self._table:
+                    self._table.clear()
+                    self._table.setRowCount(0)
+                    self._table.hide()
+                    self._message_window.hide()
+            except AttributeError:
+                pass
 
 
     def _openDBDialog(self):
