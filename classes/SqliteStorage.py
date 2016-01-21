@@ -138,7 +138,7 @@ class SqliteStorage:
                 params += [kwargs['type']]
                 query += "AND type = ? "
             if 'full_text' in kwargs and kwargs['full_text'] != "":
-                params += ["*" + kwargs['full_text'] + "*"]
+                params += ["*" + kwargs['full_text'].replace("-", "?") + "*"]
                 query += "AND id IN (SELECT docid FROM messages WHERE message MATCH ?) "
         query += " order by date_time"
         self.__cursor.execute(query, params)
