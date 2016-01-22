@@ -255,8 +255,10 @@ class Gui(QMainWindow):
             self.form_widget.objects.addItems(objects)
             self.form_widget.types.addItems(types)
             self.form_widget.show()
-            self._layout.addWidget(self._table)
-            self._layout.addWidget(self._message_window)
+            splitter = QSplitter(Qt.Vertical, self)
+            splitter.addWidget(self._table)
+            splitter.addWidget(self._message_window)
+            self._layout.addWidget(splitter)
 
     def initUI(self):
         self.setWindowTitle('Microsoft Logparser')
