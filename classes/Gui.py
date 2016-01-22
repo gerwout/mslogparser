@@ -139,6 +139,7 @@ class Gui(QMainWindow):
 
     def _handleRows(self, rows):
         count = len(rows)
+        font = QFont("Helvetica", 10, QFont.Normal)
         self._table.setRowCount(count)
         for row_index, row in enumerate(rows):
             if row_index == 0:
@@ -146,12 +147,31 @@ class Gui(QMainWindow):
                 key_length = len(keys)
                 self._table.setColumnCount(key_length)
                 self._table.setHorizontalHeaderLabels(keys)
+            #@todo: no hardcoding please
+            type = row['type'].lower()
+            if type == "error":
+                # red
+                r = 255
+                g = 0
+                b = 0
+            elif type == "warning":
+                # yellow
+                r = 255
+                g = 255
+                b = 0
+            elif type == "information":
+                # blue
+                r = 0
+                g = 255
+                b = 255
+
             for col_index, name in enumerate(keys):
                 value = row[name]
                 if isinstance(value, (int, float, complex)):
                     value = str(value)
                 item = QTableWidgetItem(value)
-                item.setForeground(QColor.fromRgb(0, 0, 0))
+                item.setBackground(QColor.fromRgb(r, g, b))
+                item.setFont(font)
                 self._table.setItem(row_index, col_index, item)
 
         self._table.resizeColumnsToContents()
@@ -233,8 +253,10 @@ class Gui(QMainWindow):
             self._table.setContextMenuPolicy(Qt.CustomContextMenu)
             self._table.customContextMenuRequested.connect(self._createRightClickMenu)
             self._table.itemSelectionChanged.connect(self.showLogMessage)
+            font = QFont("Helvetica", 10, QFont.Normal)
             self._message_window = QTextEdit()
             self._message_window.setReadOnly(True)
+            self._message_window.setFont(font)
             self._handleRows(rows)
             min_date_time = QDateTime.fromString(self._storage.getMinDateTime(), "yyyy-MM-dd HH:mm:ss")
             max_date_time = QDateTime.fromString(self._storage.getMaxDateTime(), "yyyy-MM-dd HH:mm:ss")
