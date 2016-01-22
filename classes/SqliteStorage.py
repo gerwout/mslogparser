@@ -4,6 +4,9 @@ from collections import OrderedDict
 
 class SqliteStorage:
 
+    __order_field = "date_time"
+    __order_type = "ASC"
+
     def __init__(self, filename, create=False):
         if not filename.endswith(".sqlite"):
             filename = filename + ".sqlite"
@@ -104,6 +107,18 @@ class SqliteStorage:
         return host_names
 
     def get_log_data(self, **kwargs):
+        order_by = kwargs.get('order_by')
+        if order_by != None and order_by != False:
+            # ordering on same field again, let's reverse the search
+            if order_by == self.__order_field:
+                if self.__order_type == "ASC":
+                    self.__order_type = "DESC"
+                else:
+                    self.__order_type = "ASC"
+            else:
+                self.__order_field = order_by
+                self.__order_type = "ASC"
+
         query = "SELECT strftime('%d-%m-%Y %H:%M:%f', date_time) AS date_time, host_name, pid, transid, user, object, " \
                 "type, message from logs"
         params = []
@@ -140,7 +155,7 @@ class SqliteStorage:
             if 'full_text' in kwargs and kwargs['full_text'] != "":
                 params += ["*" + kwargs['full_text'].replace("-", "?") + "*"]
                 query += "AND id IN (SELECT docid FROM messages WHERE message MATCH ?) "
-        query += " order by date_time"
+        query += " order by " + self.__order_field + " " + self.__order_type
         self.__cursor.execute(query, params)
 
         rows = self.__cursor.fetchall()

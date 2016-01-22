@@ -131,9 +131,10 @@ class Gui(QMainWindow):
         object = kwargs.get('object')
         type = kwargs.get('type')
         full_text = kwargs.get('full_text')
+        order_by = kwargs.get('order_by')
         rows = self._storage.get_log_data(first_time_stamp=first_time_stamp, second_time_stamp=second_time_stamp,
                                           host_name=host_name, pid=pid, trans_id=trans_id, user=user, object=object,
-                                          type=type, full_text=full_text)
+                                          type=type, full_text=full_text, order_by=order_by)
         self._handleRows(rows)
 
     def _handleRows(self, rows):
@@ -155,6 +156,13 @@ class Gui(QMainWindow):
 
         self._table.resizeColumnsToContents()
         self.statusBar().showMessage(str(count) + ' results.')
+
+    def _headerClicked(self, horizontalIndex):
+        order_by_column = self._table.horizontalHeaderItem(horizontalIndex).text()
+        #@todo: should not be hardcoded....
+        if order_by_column == "message":
+            return
+        self.form_widget.handleSearch(order_by=order_by_column)
 
     def showLogMessage(self):
         items = self._table.selectedItems()
@@ -216,6 +224,9 @@ class Gui(QMainWindow):
                 pass
 
             self._table = QTableWidget()
+            style = "::section {""background-color: lightgrey; }"
+            self._table.horizontalHeader().setStyleSheet(style);
+            self._table.horizontalHeader().sectionClicked.connect(self._headerClicked)
             self._table.setEditTriggers(QAbstractItemView.NoEditTriggers)
             self._table.setSelectionMode(QAbstractItemView.ExtendedSelection)
             self._table.setSelectionBehavior(QAbstractItemView.SelectRows)

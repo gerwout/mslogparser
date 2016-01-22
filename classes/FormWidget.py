@@ -50,7 +50,7 @@ class FormWidget(QWidget):
         self._grid.addStretch(1)
         self.setLayout(self._grid)
 
-    def handleSearch(self):
+    def handleSearch(self, order_by=False):
         self.search_button.setDisabled(True)
         first_time_stamp = int(self.first_date_picker.dateTime().toPyDateTime().replace(tzinfo=timezone.utc).timestamp())
         second_time_stamp = int(self.second_date_picker.dateTime().toPyDateTime().replace(tzinfo=timezone.utc).timestamp())
@@ -63,5 +63,5 @@ class FormWidget(QWidget):
         full_text = str(self.full_text_search.text())
         self.nativeParentWidget().updateTable(first_time_stamp=first_time_stamp, second_time_stamp=second_time_stamp,
                                               host_name=host_name, pid=pid, trans_id=trans_id,user=user, object=object,
-                                              type=type, full_text=full_text)
+                                              type=type, full_text=full_text, order_by=order_by)
         self.search_button.setDisabled(False)
