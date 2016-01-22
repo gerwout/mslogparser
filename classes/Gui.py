@@ -161,7 +161,6 @@ class Gui(QMainWindow):
         count = len(items)
         if count != 0:
             row = items[count - 1].row()
-            self._table.selectRow(row)
             data = self._table.model().index(row, 7).data()
             self._message_window.setText(data)
 
@@ -217,6 +216,9 @@ class Gui(QMainWindow):
                 pass
 
             self._table = QTableWidget()
+            self._table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+            self._table.setSelectionMode(QAbstractItemView.ExtendedSelection)
+            self._table.setSelectionBehavior(QAbstractItemView.SelectRows)
             self._table.setContextMenuPolicy(Qt.CustomContextMenu)
             self._table.customContextMenuRequested.connect(self._createRightClickMenu)
             self._table.itemSelectionChanged.connect(self.showLogMessage)
