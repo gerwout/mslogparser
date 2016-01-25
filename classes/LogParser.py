@@ -7,7 +7,7 @@ class LogParser:
 
     def __parse_line(self, line):
         m =  re.match("^\[([0-9-]+\s+[0-9:\.]+)\s+([a-zA-Z0-9-_]+)\s+([a-zA-Z0-9]+)\s+([a-zA-Z0-9]+)\s+"
-                      "([a-zA-Z0-9\\\]+)?\s+([.a-zA-Z0-9_-]+)\s+([a-zA-Z]+)\s{0,}\]\s+(.*)$", line)
+                      "([a-zA-Z0-9\\\_]+)?\s+([.a-zA-Z0-9_-]+)\s+([a-zA-Z]+)\s{0,}\]\s+(.*)$", line)
         try:
             return m.groups()
         except AttributeError:
