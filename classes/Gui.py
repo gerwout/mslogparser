@@ -149,7 +149,7 @@ class Gui(QMainWindow):
                 self._table.setHorizontalHeaderLabels(keys)
             #@todo: no hardcoding please
             type = row['type'].lower()
-            if type == "error":
+            if type == "error" or type == "critical":
                 # red
                 r = 255
                 g = 0
@@ -159,7 +159,7 @@ class Gui(QMainWindow):
                 r = 255
                 g = 255
                 b = 0
-            elif type == "information":
+            elif type == "information" or type == "verbose":
                 # blue
                 r = 0
                 g = 255
