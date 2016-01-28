@@ -6,8 +6,16 @@ class LogParser:
         self._storage = kwargs.get('storage')
 
     def __parse_line(self, line):
+        # ^\[([0-9-]+\s+[0-9:\.]+)\s+ date
+        # ([a-zA-Z0-9-_]+)\s+ hostname
+        # ([a-zA-Z0-9]+)\s+ process id
+        # ([a-zA-Z0-9]+)\s+ transaction id -end of first line regex-
+        # ([a-zA-Z0-9\\\_]+)?\s+ (optional) user
+        # ([.a-zA-Z0-9_-`]+)\s+ class/page that generates the error
+        # ([a-zA-Z]+)\s{0,}\]\s+ type of error
+        # (.*)$ message
         m =  re.match("^\[([0-9-]+\s+[0-9:\.]+)\s+([a-zA-Z0-9-_]+)\s+([a-zA-Z0-9]+)\s+([a-zA-Z0-9]+)\s+"
-                      "([a-zA-Z0-9\\\_]+)?\s+([.a-zA-Z0-9_-]+)\s+([a-zA-Z]+)\s{0,}\]\s+(.*)$", line)
+                      "([a-zA-Z0-9\\\_-]+)?\s+([.a-zA-Z0-9_-`]+)\s+([a-zA-Z]+)\s{0,}\]\s+(.*)$", line)
         try:
             return m.groups()
         except AttributeError:
