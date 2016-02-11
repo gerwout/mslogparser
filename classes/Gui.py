@@ -302,6 +302,22 @@ class Gui(QMainWindow):
             splitter.addWidget(self._message_window)
             self._layout.addWidget(splitter)
 
+    def _showAboutDialog(self):
+        dialog = QMessageBox()
+        dialog.setIcon(QMessageBox.Information)
+        dialog.setText("<b>Logparser 0.7</b><br><br><a href='https://github.com/gerwout/mslogparser'>Website</a>")
+        dialog.setWindowTitle("About")
+        dialog.setStandardButtons(QMessageBox.Ok)
+        res = dialog.exec_()
+
+
+    def _getAboutAction(self):
+        aboutAction = QAction('&About', self)
+        aboutAction.setStatusTip('About application')
+        aboutAction.triggered.connect(self._showAboutDialog)
+
+        return aboutAction
+
     def initUI(self):
         self.setWindowTitle('Microsoft Logparser')
         self.statusBar()
@@ -310,6 +326,7 @@ class Gui(QMainWindow):
         self.logFileAction = self._getOpenLogFileAction()
         self.createDBAction = self._getCreateDBAction()
         self.openDBAction = self._getOpenDBAction()
+        self.aboutAction = self._getAboutAction()
 
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('&File')
@@ -317,6 +334,9 @@ class Gui(QMainWindow):
         fileMenu.addAction(self.openDBAction)
         fileMenu.addAction(self.logFileAction)
         fileMenu.addAction(self.exitAction)
+        aboutMenu = menubar.addMenu('&Help')
+        aboutMenu.addAction(self.aboutAction)
+
         self._layout = QVBoxLayout()
         self._layout.setAlignment(Qt.AlignTop)
         self.form_widget = FormWidget(self)
