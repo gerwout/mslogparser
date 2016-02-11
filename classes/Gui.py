@@ -1,3 +1,5 @@
+import tempfile
+
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -117,6 +119,24 @@ class Gui(QMainWindow):
             self.statusBar().showMessage('Busy creating indexes...')
             self._storage.update_fulltext_index()
             self._storage.create_indexes()
+            if parser.has_failed_log_entries():
+                failed_entries = parser.get_failed_lag_entries()
+                f = tempfile.NamedTemporaryFile(delete=False)
+                file_name = f.name
+                for entry in failed_entries:
+                    f.write(bytes("%s" % entry, "utf-8"))
+                f.close()
+                parser.failed_log_lines = []
+                dialog = QMessageBox()
+                dialog.setIcon(QMessageBox.Information)
+                dialog.setText("Could not parse all log lines!")
+                dialog.setWindowTitle("Could not parse all log lines!")
+                msg = "Erroneous log lines copied to the following file: " + file_name + "\n\n"
+                msg += "Please forward this log file to get this fixed"
+                dialog.setDetailedText(msg)
+                dialog.setStandardButtons(QMessageBox.Ok)
+                res = dialog.exec_()
+
             self._fillTable()
 
     def updateTable(self, **kwargs):
