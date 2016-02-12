@@ -193,8 +193,6 @@ class Gui(QMainWindow):
                 item.setBackground(QColor.fromRgb(r, g, b))
                 item.setFont(font)
                 self._table.setItem(row_index, col_index, item)
-
-        self._table.resizeColumnsToContents()
         self.statusBar().showMessage(str(count) + ' results.')
 
     def _headerClicked(self, horizontalIndex):
@@ -262,8 +260,9 @@ class Gui(QMainWindow):
                     self._table = None
             except AttributeError:
                 pass
-
             self._table = QTableWidget()
+            self._table.horizontalHeader().setStretchLastSection(True);
+            self._table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
             style = "::section {""background-color: lightgrey; }"
             self._table.horizontalHeader().setStyleSheet(style);
             self._table.horizontalHeader().sectionClicked.connect(self._headerClicked)
