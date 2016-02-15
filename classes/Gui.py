@@ -254,10 +254,11 @@ class Gui(QMainWindow):
         rows = self._storage.get_log_data()
         if rows:
             try:
-                if self._table:
-                    self._layout.removeWidget(self._table)
-                    self._layout.removeWidget(self._message_window)
-                    self._table = None
+                if self._splitter:
+                    self._splitter.setParent(None)
+                    self._splitter.deleteLater()
+                    self._layout.removeWidget(self._splitter)
+                    self._splitter = None
             except AttributeError:
                 pass
             self._table = QTableWidget()
@@ -296,15 +297,15 @@ class Gui(QMainWindow):
             self.form_widget.objects.addItems(objects)
             self.form_widget.types.addItems(types)
             self.form_widget.show()
-            splitter = QSplitter(Qt.Vertical, self)
-            splitter.addWidget(self._table)
-            splitter.addWidget(self._message_window)
-            self._layout.addWidget(splitter)
+            self._splitter = QSplitter(Qt.Vertical, self)
+            self._splitter.addWidget(self._table)
+            self._splitter.addWidget(self._message_window)
+            self._layout.addWidget(self._splitter)
 
     def _showAboutDialog(self):
         dialog = QMessageBox()
         dialog.setIcon(QMessageBox.Information)
-        dialog.setText("<b>Logparser 0.7</b><br><br><a href='https://github.com/gerwout/mslogparser'>Website</a>")
+        dialog.setText("<b>Logparser 0.8</b><br><br><a href='https://github.com/gerwout/mslogparser'>Website</a>")
         dialog.setWindowTitle("About")
         dialog.setStandardButtons(QMessageBox.Ok)
         res = dialog.exec_()
