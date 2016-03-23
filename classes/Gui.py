@@ -295,6 +295,8 @@ class Gui(QMainWindow):
             self.form_widget.trans_ids.addItems(trans_ids)
             self.form_widget.users.addItems(users)
             self.form_widget.objects.addItems(objects)
+            self.form_widget.types.clear()
+            self.form_widget.types.addItem("-")
             self.form_widget.types.addItems(types)
             self.form_widget.show()
             self._splitter = QSplitter(Qt.Vertical, self)
@@ -305,7 +307,7 @@ class Gui(QMainWindow):
     def _showAboutDialog(self):
         dialog = QMessageBox()
         dialog.setIcon(QMessageBox.Information)
-        dialog.setText("<b>Logparser 0.8</b><br><br><a href='https://github.com/gerwout/mslogparser'>Website</a>")
+        dialog.setText("<b>Logparser 0.9</b><br><br><a href='https://github.com/gerwout/mslogparser'>Website</a>")
         dialog.setWindowTitle("About")
         dialog.setStandardButtons(QMessageBox.Ok)
         res = dialog.exec_()
