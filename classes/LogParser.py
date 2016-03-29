@@ -44,7 +44,7 @@ class LogParser:
         total = ""
         old_date_time = False
         old_object = False
-        with open(file_name, encoding="utf-8") as file:
+        with open(file_name, encoding="utf-8", errors='ignore') as file:
             did_loop = False
             for idx, line in enumerate(file):
                 tup = self.__parse_line(line)
