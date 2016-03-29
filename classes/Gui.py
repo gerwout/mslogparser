@@ -196,7 +196,11 @@ class Gui(QMainWindow):
         self.statusBar().showMessage(str(count) + ' results.')
 
     def _headerClicked(self, horizontalIndex):
-        order_by_column = self._table.horizontalHeaderItem(horizontalIndex).text()
+        try:
+            order_by_column = self._table.horizontalHeaderItem(horizontalIndex).text()
+        # if there is a search without any results, there is no text property in the header
+        except AttributeError:
+            return
         #@todo: should not be hardcoded....
         if order_by_column == "message":
             return
