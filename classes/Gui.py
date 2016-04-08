@@ -311,7 +311,7 @@ class Gui(QMainWindow):
     def _showAboutDialog(self):
         dialog = QMessageBox()
         dialog.setIcon(QMessageBox.Information)
-        dialog.setText("<b>Logparser 0.9</b><br><br><a href='https://github.com/gerwout/mslogparser'>Website</a>")
+        dialog.setText("<b>Logparser 1.0</b><br><br><a href='https://github.com/gerwout/mslogparser'>Website</a>")
         dialog.setWindowTitle("About")
         dialog.setStandardButtons(QMessageBox.Ok)
         res = dialog.exec_()
