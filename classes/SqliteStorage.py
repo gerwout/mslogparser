@@ -155,7 +155,11 @@ class SqliteStorage:
             if 'full_text' in kwargs and kwargs['full_text'] != "":
                 params += ["*" + kwargs['full_text'].replace("-", "?") + "*"]
                 query += "AND id IN (SELECT docid FROM messages WHERE message MATCH ?) "
-        query += " order by " + self.__order_field + " " + self.__order_type
+        if self.__order_field == "date_time":
+            order = "datetime(" + self.__order_field + ")"
+        else:
+            order = self.__order_field
+        query += " order by " + order + " " + self.__order_type
         self.__cursor.execute(query, params)
 
         rows = self.__cursor.fetchall()
