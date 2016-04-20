@@ -105,8 +105,7 @@ class Gui(QMainWindow):
 
     def _openFileDialog(self):
         fileObj = QFileDialog.getOpenFileNames(parent=self, caption='Open file', directory=expanduser("~"))
-
-        if fileObj and fileObj[0] != "":
+        if fileObj and len(fileObj[0]) > 0:
             self._storage.drop_fulltext_index()
             self._storage.drop_indexes()
             parser = LogParser(storage=self._storage)
