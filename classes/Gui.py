@@ -169,6 +169,7 @@ class Gui(QMainWindow):
                 self._table.setHorizontalHeaderLabels(keys)
             #@todo: no hardcoding please
             type = row['type'].lower()
+            date_time = row['date_time'].lower()
             if type == "error" or type == "critical":
                 # red
                 r = 255
@@ -294,10 +295,20 @@ class Gui(QMainWindow):
             self.form_widget.first_date_picker.setDateTime(min_date_time)
             self.form_widget.second_date_picker.setMaximumDateTime(max_date_time)
             self.form_widget.second_date_picker.setDateTime(max_date_time)
+            self.form_widget.host_names.clear()
+            self.form_widget.host_names.addItem("-")
             self.form_widget.host_names.addItems(hostnames)
+            self.form_widget.pids.clear()
+            self.form_widget.pids.addItem("-")
             self.form_widget.pids.addItems(pids)
+            self.form_widget.trans_ids.clear()
+            self.form_widget.trans_ids.addItem("-")
             self.form_widget.trans_ids.addItems(trans_ids)
+            self.form_widget.users.clear()
+            self.form_widget.users.addItem("-")
             self.form_widget.users.addItems(users)
+            self.form_widget.objects.clear()
+            self.form_widget.objects.addItem("-")
             self.form_widget.objects.addItems(objects)
             self.form_widget.types.clear()
             self.form_widget.types.addItem("-")
