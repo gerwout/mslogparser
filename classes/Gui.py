@@ -236,7 +236,7 @@ class Gui(QMainWindow):
         fileObj = QFileDialog.getSaveFileName(self, "Save csv file", "", ".csv")
         if fileObj and fileObj[0] != "":
             file_name = fileObj[0] + fileObj[1]
-            csv_file = open(file_name, "w")
+            csv_file = open(file_name, "w", encoding="utf-8", errors='ignore')
             csv_file.write(csv_content)
             csv_file.close()
             self.statusBar().showMessage(file_name + ' saved.')
